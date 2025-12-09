@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Serveur Discord Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0118;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        #spaceCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .content-wrapper {
+            /* Wrapper pour gérer l'animation de changement de langue */
+            position: relative;
+            z-index: 1;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .content-wrapper.transitioning {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        /* Language Switcher Styles */
+        .language-switcher {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+            background: rgba(30, 20, 60, 0.6);
+            border: 2px solid rgba(124, 58, 237, 0.5);
+            border-radius: 50px;
+            padding: 5px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(124, 58, 237, 0.2);
+        }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 50px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .lang-btn:hover {
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .lang-btn.active {
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            color: white;
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.5);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 80px 20px;
+            position: relative;
+        }
+        .expert-badge {
+            display: inline-block;
+            background: rgba(30, 20, 60, 0.6);
+            border: 2px solid rgba(124, 58, 237, 0.5);
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 0.95em;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        h1 {
+            font-size: 4.5em;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .next-level {
+            font-size: 4.5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 50%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+        }
+        .hero-description {
+            max-width: 700px;
+            margin: 0 auto 50px;
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            border: none;
+            padding: 18px 45px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.15em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(124, 58, 237, 0.6);
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid rgba(124, 58, 237, 0.5);
+            padding: 18px 45px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.15em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover {
+            background: rgba(30, 20, 60, 0.6);
+            border-color: rgba(124, 58, 237, 0.8);
+            transform: translateY(-3px);
+        }
+        /* How it works Section */
+        .how-section {
+            padding: 120px 20px;
+            text-align: center;
+        }
+        .section-title {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateY(-50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .section-title.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .section-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1em;
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(-30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.2s;
+        }
+        .section-subtitle.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .steps-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+            position: relative;
+        }
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7c3aed, transparent);
+            z-index: -1;
+        }
+        .step-item {
+            opacity: 0;
+            transform: translateX(-100px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .step-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .step-item:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+        .step-item:nth-child(3) {
+            transition-delay: 0.4s;
+        }
+        .step-number {
+            width: 100px;
+            height: 100px;
+            border: 3px solid #7c3aed;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            background: rgba(124, 58, 237, 0.1);
+            position: relative;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7); }
+            50% { box-shadow: 0 0 0 20px rgba(124, 58, 237, 0); }
+        }
+        .step-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .step-description {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+        /* Why Choose Section */
+        .why-section {
+            padding: 120px 20px;
+            text-align: center;
+        }
+        .why-underline {
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, #7c3aed, #6366f1);
+            margin: 0 auto 60px;
+            border-radius: 2px;
+        }
+        .why-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .why-card {
+            background: rgba(20, 15, 40, 0.4);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 20px;
+            padding: 40px 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+            opacity: 0;
+            transform: translateY(80px);
+        }
+        .why-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .why-card:nth-child(1) { transition-delay: 0.1s; }
+        .why-card:nth-child(2) { transition-delay: 0.2s; }
+        .why-card:nth-child(3) { transition-delay: 0.3s; }
+        .why-card:nth-child(4) { transition-delay: 0.4s; }
+        .why-card:hover {
+            border-color: rgba(124, 58, 237, 0.6);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.3);
+        }
+        .why-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2em;
+        }
+        .why-title {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .why-description {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+        /* Packages Section */
+        .packages-section {
+            padding: 120px 20px;
+        }
+        .packages-container {
+            max-width: 1300px;
+            margin: 60px auto 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .package-card {
+            background: rgba(20, 15, 40, 0.6);
+            border: 2px solid rgba(124, 58, 237, 0.3);
+            border-radius: 25px;
+            padding: 45px 35px;
+            backdrop-filter: blur(10px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            opacity: 0;
+            transform: translateY(100px) scale(0.95);
+        }
+        .package-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .package-card:nth-child(1) { transition-delay: 0.1s; }
+        .package-card:nth-child(2) { transition-delay: 0.3s; }
+        .package-card:nth-child(3) { transition-delay: 0.5s; }
+        .package-card:hover {
+            border-color: rgba(124, 58, 237, 0.8);
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(124, 58, 237, 0.4);
+        }
+        .package-card.premium {
+            background: linear-gradient(145deg, rgba(50, 30, 20, 0.6), rgba(30, 20, 10, 0.8));
+            border-color: rgba(234, 179, 8, 0.5);
+        }
+        .package-card.premium:hover {
+            border-color: rgba(234, 179, 8, 0.8);
+            box-shadow: 0 25px 50px rgba(234, 179, 8, 0.3);
+        }
+        .best-choice-badge {
+            position: absolute;
+            top: -15px;
+            right: 30px;
+            background: linear-gradient(135deg, #eab308, #f59e0b);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+            color: #000;
+        }
+        .package-name {
+            font-size: 2em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        .package-price {
+            font-size: 3.5em;
+            font-weight: 900;
+            margin: 20px 0;
+        }
+        .package-card.premium .package-price {
+            color: #eab308;
+        }
+        .package-features {
+            margin: 30px 0;
+            text-align: left;
+        }
+        .feature-item {
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .feature-item::before {
+            content: "✓";
+            color: #7c3aed;
+            font-weight: bold;
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+        .package-card.premium .feature-item::before {
+            color: #eab308;
+        }
+        .package-button {
+            width: 100%;
+            background: rgba(124, 58, 237, 0.2);
+            border: 2px solid rgba(124, 58, 237, 0.5);
+            padding: 16px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        .package-button:hover {
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+        .package-card.premium .package-button {
+            background: linear-gradient(135deg, #eab308, #f59e0b);
+            border: none;
+            color: #000;
+            font-weight: 700;
+        }
+        .package-card.premium .package-button:hover {
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+        }
+        /* FAQ Section */
+        .faq-section {
+            padding: 120px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .faq-container {
+            background: rgba(20, 15, 40, 0.4);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 25px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+        .faq-item {
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 25px 0;
+            opacity: 0;
+            transform: translateX(80px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .faq-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .faq-item:nth-child(1) { transition-delay: 0.1s; }
+        .faq-item:nth-child(2) { transition-delay: 0.15s; }
+        .faq-item:nth-child(3) { transition-delay: 0.2s; }
+        .faq-item:nth-child(4) { transition-delay: 0.25s; }
+        .faq-item:nth-child(5) { transition-delay: 0.3s; }
+        .faq-item:nth-child(6) { transition-delay: 0.35s; }
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            padding: 10px 0;
+        }
+        .faq-icon {
+            font-size: 1.5em;
+            color: #7c3aed;
+            transition: transform 0.3s;
+            flex-shrink: 0;
+            margin-left: 15px;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+            padding-top: 0;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-top: 15px;
+        }
+        /* CTA Section */
+        .cta-section {
+            padding: 120px 20px;
+            text-align: center;
+        }
+        .cta-title {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .cta-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+        .cta-button {
+            background: white;
+            color: #0a0118;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 50px;
+            font-size: 1.15em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+        }
+        @media (max-width: 768px) {
+            h1, .next-level { font-size: 3em; }
+            .steps-container { grid-template-columns: 1fr; gap: 40px; }
+            .steps-container::before { display: none; }
+            .packages-container { grid-template-columns: 1fr; }
+            .section-title { font-size: 2.2em; }
+            .language-switcher {
+                top: 20px;
+                right: 20px;
+                padding: 3px;
+            }
+            .lang-btn {
+                padding: 6px 10px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="spaceCanvas"></canvas>
+
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <!-- FR, EN, ES -->
+        <button class="lang-btn active" onclick="startLanguageChange('fr')" data-lang="fr">FR</button>
+        <button class="lang-btn" onclick="startLanguageChange('en')" data-lang="en">EN</button>
+        <button class="lang-btn" onclick="startLanguageChange('es')" data-lang="es">ES</button>
+    </div>
+
+    <div class="content-wrapper" id="contentWrapper">
+        <div class="content">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="expert-badge" data-key="badge">Expert Discord Fiverr 🚀</div>
+                <h1 data-key="title1">Votre Serveur Discord</h1>
+                <div class="next-level" data-key="title2">Next Level</div>
+                <p class="hero-description" data-key="heroDesc">
+                    Création de serveurs professionnels pour le gaming, les streamers et les entreprises. Automatisé, sécurisé et prêt à accueillir votre communauté.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#packages" class="btn-primary" data-key="btnSeeOffers">Voir les offres</a>
+                    <a href="https://fr.fiverr.com/liam_db" target="_blank" class="btn-secondary" data-key="btnContact">Me contacter</a>
+                </div>
+            </section>
+
+            <!-- How it Works -->
+            <section class="how-section">
+                <h2 class="section-title" data-key="howTitle">Comment ça marche ?</h2>
+                <p class="section-subtitle" data-key="howSubtitle">Simple, rapide, efficace.</p>
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">01</div>
+                        <h3 class="step-title" data-key="step1Title">Commande & Brief</h3>
+                        <p class="step-description" data-key="step1Desc">Commandez et indiquez-moi le thème de votre serveur.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">02</div>
+                        <h3 class="step-title" data-key="step2Title">Construction</h3>
+                        <p class="step-description" data-key="step2Desc">Je configure les rôles, les bots et le design complet.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">03</div>
+                        <h3 class="step-title" data-key="step3Title">Livraison</h3>
+                        <p class="step-description" data-key="step3Desc">Je vous transfère la propriété totale du serveur.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Why Choose Me -->
+            <section class="why-section">
+                <h2 class="section-title" data-key="whyTitle">Pourquoi Me Choisir ?</h2>
+                <div class="why-underline"></div>
+                <div class="why-grid">
+                    <div class="why-card">
+                        <div class="why-icon">👑</div>
+                        <h3 class="why-title" data-key="why1Title">Rapport Qualité/Prix</h3>
+                        <p class="why-description" data-key="why1Desc">Je construis mon portfolio, vous bénéficiez d'un service premium (5-20$) au meilleur prix.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon">⚡</div>
+                        <h3 class="why-title" data-key="why2Title">Rapide & Expert</h3>
+                        <p class="why-description" data-key="why2Desc">Tests personnels de tous les bots, rôles et permissions avant livraison.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon">🛡️</div>
+                        <h3 class="why-title" data-key="why3Title">Sécurité Totale</h3>
+                        <p class="why-description" data-key="why3Desc">Pas de bots suspects. Configuration anti-raid et vérification incluse.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon">🎮</div>
+                        <h3 class="why-title" data-key="why4Title">Spécialisé Gaming</h3>
+                        <p class="why-description" data-key="why4Desc">Expérience approfondie pour les communautés de jeux et streamers.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Packages -->
+            <section class="packages-section" id="packages">
+                <h2 class="section-title" style="text-align: center;" data-key="packagesTitle">Choisissez Votre Plan</h2>
+                <div class="packages-container">
+                    <!-- BASIC -->
+                    <div class="package-card">
+                        <div class="package-name" data-key="basic">BASIC</div>
+                        <div class="package-price">5$</div>
+                        <div class="package-features">
+                            <div class="feature-item" data-key="feature1">Design professionnel & canaux</div>
+                            <div class="feature-item" data-key="feature2">Rôles et permissions personnalisés</div>
+                            <div class="feature-item" data-key="feature3">Bot de bienvenue</div>
+                            <div class="feature-item" data-key="feature4">Rapport qualité-prix imbattable</div>
+                        </div>
+                        <!-- Link updated here -->
+                        <button class="package-button" onclick="window.open(translations[currentLang].basicUrl, '_blank')" data-key="btnChoose">Choisissez votre plan</button>
+                        <p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 15px; font-size: 0.9em;" data-key="delivery2">⏱️ Livraison en 2 jours</p>
+                    </div>
+                    <!-- STANDARD -->
+                    <div class="package-card">
+                        <div class="package-name" data-key="standard">STANDARD</div>
+                        <div class="package-price">10$</div>
+                        <div class="package-features">
+                            <div class="feature-item" data-key="feature5">Tout ce qu'il y a dans Basic</div>
+                            <div class="feature-item" data-key="feature6">Système de vérification (Sécurité)</div>
+                            <div class="feature-item" data-key="feature7">Auto-modération</div>
+                            <div class="feature-item" data-key="feature8">Bots Musique & Mini-jeux</div>
+                            <div class="feature-item" data-key="feature9">Emojis personnalisés</div>
+                        </div>
+                        <!-- Link updated here -->
+                        <button class="package-button" onclick="window.open(translations[currentLang].standardUrl, '_blank')" data-key="btnChoose">Choisissez votre plan</button>
+                        <p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 15px; font-size: 0.9em;" data-key="delivery3">⏱️ Livraison en 3 jours</p>
+                    </div>
+                    <!-- PREMIUM -->
+                    <div class="package-card premium">
+                        <div class="best-choice-badge" data-key="bestChoice">MEILLEUR CHOIX</div>
+                        <div class="package-name" data-key="premium">PREMIUM</div>
+                        <div class="package-price">20$</div>
+                        <div class="package-features">
+                            <div class="feature-item" data-key="feature10">Tout ce qu'il y a dans Standard</div>
+                            <div class="feature-item" data-key="feature11">Système de Tickets (Support)</div>
+                            <div class="feature-item" data-key="feature12">Sécurité Anti-Raid avancée</div>
+                            <div class="feature-item" data-key="feature13">Système de Leveling</div>
+                            <div class="feature-item" data-key="feature14">Alertes Twitch & YouTube</div>
+                        </div>
+                        <!-- Link updated here -->
+                        <button class="package-button" onclick="window.open(translations[currentLang].premiumUrl, '_blank')" data-key="btnChoose">Choisissez votre plan</button>
+                        <p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 15px; font-size: 0.9em;" data-key="delivery5">⏱️ Livraison en 5 jours</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section class="faq-section">
+                <h2 class="section-title" style="text-align: center; margin-bottom: 50px;" data-key="faqTitle">Questions Fréquentes</h2>
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-key="faq1Q">Serai-je le propriétaire du serveur une fois terminé ?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer" data-key="faq1A">
+                            Oui, absolument ! Une fois le travail terminé, je vous transfère la propriété complète. Vous serez l'administrateur principal et aurez un contrôle total.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-key="faq2Q">Dois-je payer pour les bots ?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer" data-key="faq2A">
+                            Non ! Je n'utilise que des bots gratuits de haute qualité. Vous n'avez rien à payer en plus pour qu'ils fonctionnent.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-key="faq3Q">Pouvez-vous travailler sur un serveur que j'ai déjà ?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer" data-key="faq3A">
+                            Oui ! Je peux rénover votre serveur existant. Vous pouvez soit transférer la propriété temporairement, soit simplement me donner un rôle avec les permissions d'administrateur.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-key="faq4Q">Puis-je demander des modifications ?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer" data-key="faq4A">
+                            Oui ! Votre satisfaction est ma priorité. Je propose jusqu'à 5 révisions pour m'assurer que vous êtes content du résultat.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-key="faq5Q">Créez-vous des bots codés sur mesure (programmation) ?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer" data-key="faq5A">
+                            Non. Je me spécialise dans la configuration de bots existants avancés (comme MEE6, Dyno, Ticket Tool) pour faire exactement ce dont vous avez besoin.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-key="faq6Q">Travaillez-vous sur des serveurs NSFW (18+) ou illégaux ?</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer" data-key="faq6A">
+                            Non. Je refuse strictement de travailler sur des serveurs NSFW ou tout serveur violant les Conditions d'Utilisation de Discord.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <section class="cta-section">
+                <h2 class="cta-title" data-key="ctaTitle">Prêt à lancer votre communauté ? </h2>
+                <p class="cta-subtitle" data-key="ctaSubtitle">Envoyez-moi un message avant de commander pour discuter de votre projet !</p>
+                <a href="https://fr.fiverr.com/liam_db/create-a-professional-and-custom-discord-server?context_referrer=seller_page&ref_ctx_id=21dcf297c5df4bf29a197e2a030cc261&pckg_id=1&pos=1&imp_id=4279f855-ae2f-4e7b-8b1c-cfb2f5cda095" target="_blank" class="cta-button" data-key="ctaBtn">
+                    🚀 Accéder au produit
+                </a>
+            </section>
+
+            <!-- Footer -->
+            <footer style="text-align: center; padding: 40px 20px; border-top: 1px solid rgba(124, 58, 237, 0.2); background: rgba(10, 1, 24, 0.8);">
+                <p style="color: rgba(255, 255, 255, 0.5); font-size: 0.95em;" data-key="copyright">
+                    © 2025 Discord Server Setup. Tous droits réservés.
+                </p>
+            </footer>
+        </div>
+    </div>
+    <script>
+        // Specific links for payment sessions (French version provided by user)
+        const paymentLinks = {
+            basic: "https://fr.fiverr.com/v4/payments/new?paymentSessionID=69378468f86ef397c678e002",
+            standard: "https://fr.fiverr.com/v4/payments/new?paymentSessionID=693784cc78b8ad736f181807",
+            premium: "https://fr.fiverr.com/v4/payments/new?paymentSessionID=693784de3d766e3e47156ef2",
+        };
+        const productUrl = "https://fr.fiverr.com/liam_db/create-a-professional-and-custom-discord-server?context_referrer=seller_page&ref_ctx_id=21dcf297c5df4bf29a197e2a030cc261&pckg_id=1&pos=1&imp_id=4279f855-ae2f-4e7b-8b1c-cfb2f5cda095"; // Lien principal vers le service
+
+        // Translations (including the specific URLs for plan buttons)
+        const translations = {
+            fr: {
+                badge: "Expert Discord Fiverr 🚀",
+                title1: "Votre Serveur Discord",
+                title2: "Next Level",
+                heroDesc: "Création de serveurs professionnels pour le gaming, les streamers et les entreprises. Automatisé, sécurisé et prêt à accueillir votre communauté.",
+                btnSeeOffers: "Voir les offres",
+                btnContact: "Me contacter",
+                howTitle: "Comment ça marche ?",
+                howSubtitle: "Simple, rapide, efficace.",
+                step1Title: "Commande & Brief",
+                step1Desc: "Commandez et indiquez-moi le thème de votre serveur.",
+                step2Title: "Construction",
+                step2Desc: "Je configure les rôles, les bots et le design complet.",
+                step3Title: "Livraison",
+                step3Desc: "Je vous transfère la propriété totale du serveur.",
+                whyTitle: "Pourquoi Me Choisir ?",
+                why1Title: "Rapport Qualité/Prix",
+                why1Desc: "Je construis mon portfolio, vous bénéficiez d'un service premium (5-20$) au meilleur prix.",
+                why2Title: "Rapide & Expert",
+                why2Desc: "Tests personnels de tous les bots, rôles et permissions avant livraison.",
+                why3Title: "Sécurité Totale",
+                why3Desc: "Pas de bots suspects. Configuration anti-raid et vérification incluse.",
+                why4Title: "Spécialisé Gaming",
+                why4Desc: "Expérience approfondie pour les communautés de jeux et streamers.",
+                packagesTitle: "Choisissez Votre Plan",
+                basic: "BASIC",
+                standard: "STANDARD",
+                premium: "PREMIUM",
+                bestChoice: "MEILLEUR CHOIX",
+                feature1: "Design professionnel & canaux",
+                feature2: "Rôles et permissions personnalisés",
+                feature3: "Bot de bienvenue",
+                feature4: "Rapport qualité-prix imbattable",
+                feature5: "Tout ce qu'il y a dans Basic",
+                feature6: "Système de vérification (Sécurité)",
+                feature7: "Auto-modération",
+                feature8: "Bots Musique & Mini-jeux",
+                feature9: "Emojis personnalisés",
+                feature10: "Tout ce qu'il y a dans Standard",
+                feature11: "Système de Tickets (Support)",
+                feature12: "Sécurité Anti-Raid avancée",
+                feature13: "Système de Leveling",
+                feature14: "Alertes Twitch & YouTube",
+                btnChoose: "Choisissez votre plan",
+                delivery2: "⏱️ Livraison en 2 jours",
+                delivery3: "⏱️ Livraison en 3 jours",
+                delivery5: "⏱️ Livraison en 5 jours",
+                faqTitle: "Questions Fréquentes",
+                faq1Q: "Serai-je le propriétaire du serveur une fois terminé ?",
+                faq1A: "Oui, absolument ! Une fois le travail terminé, je vous transfère la propriété complète. Vous serez l'administrateur principal et aurez un contrôle total.",
+                faq2Q: "Dois-je payer pour les bots ?",
+                faq2A: "Non ! Je n'utilise que des bots gratuits de haute qualité. Vous n'avez rien à payer en plus pour qu'ils fonctionnent.",
+                faq3Q: "Pouvez-vous travailler sur un serveur que j'ai déjà ?",
+                faq3A: "Oui ! Je peux rénover votre serveur existant. Vous pouvez soit transférer la propriété temporairement, soit simplement me donner un rôle avec les permissions d'administrateur.",
+                faq4Q: "Puis-je demander des modifications ?",
+                faq4A: "Oui ! Votre satisfaction est ma priorité. Je propose jusqu'à 5 révisions pour m'assurer que vous êtes content du résultat.",
+                faq5Q: "Créez-vous des bots codés sur mesure (programmation) ?",
+                faq5A: "Non. Je me spécialise dans la configuration de bots existants avancés (comme MEE6, Dyno, Ticket Tool) pour faire exactement ce dont vous avez besoin.",
+                faq6Q: "Travaillez-vous sur des serveurs NSFW (18+) ou illégaux ?",
+                faq6A: "Non. Je refuse strictement de travailler sur des serveurs NSFW ou tout serveur violant les Conditions d'Utilisation de Discord.",
+                ctaTitle: "Prêt à lancer votre communauté ?",
+                ctaSubtitle: "Envoyez-moi un message avant de commander pour discuter de votre projet !",
+                ctaBtn: "🚀 Accéder au produit",
+                copyright: "© 2025 Discord Server Setup. Tous droits réservés.",
+                // Specific URLs for FR
+                basicUrl: paymentLinks.basic,
+                standardUrl: paymentLinks.standard,
+                premiumUrl: paymentLinks.premium,
+                contactUrl: productUrl, // Le CTA général mène au produit/service
+            },
+            en: {
+                badge: "Discord Fiverr Expert 🚀",
+                title1: "Your Discord Server",
+                title2: "Next Level",
+                heroDesc: "Creating professional servers for gaming, streamers and businesses. Automated, secure and ready to welcome your community.",
+                btnSeeOffers: "View offers",
+                btnContact: "Contact me",
+                howTitle: "How does it work?",
+                howSubtitle: "Simple, fast, effective.",
+                step1Title: "Order & Brief",
+                step1Desc: "Order and tell me your server theme.",
+                step2Title: "Construction",
+                step2Desc: "I configure roles, bots and complete design.",
+                step3Title: "Delivery",
+                step3Desc: "I transfer full ownership of the server to you.",
+                whyTitle: "Why Choose Me?",
+                why1Title: "Quality/Price Ratio",
+                why1Desc: "I'm building my portfolio, you benefit from premium service (5-20$) at the best price.",
+                why2Title: "Fast & Expert",
+                why2Desc: "Personal testing of all bots, roles and permissions before delivery.",
+                why3Title: "Total Security",
+                why3Desc: "No suspicious bots. Anti-raid configuration and verification included.",
+                why4Title: "Gaming Specialist",
+                why4Desc: "In-depth experience for gaming communities and streamers.",
+                packagesTitle: "Choose Your Plan",
+                basic: "BASIC",
+                standard: "STANDARD",
+                premium: "PREMIUM",
+                bestChoice: "BEST CHOICE",
+                feature1: "Professional design & channels",
+                feature2: "Custom roles and permissions",
+                feature3: "Welcome bot",
+                feature4: "Unbeatable quality-price ratio",
+                feature5: "Everything in Basic",
+                feature6: "Verification system (Security)",
+                feature7: "Auto-moderation",
+                feature8: "Music Bots & Mini-games",
+                feature9: "Custom emojis",
+                feature10: "Everything in Standard",
+                feature11: "Ticket System (Support)",
+                feature12: "Advanced Anti-Raid security",
+                feature13: "Leveling System",
+                feature14: "Twitch & YouTube alerts",
+                btnChoose: "Choose your plan",
+                delivery2: "⏱️ 2-day delivery",
+                delivery3: "⏱️ 3-day delivery",
+                delivery5: "⏱️ 5-day delivery",
+                faqTitle: "Frequently Asked Questions",
+                faq1Q: "Will I be the owner of the server once completed?",
+                faq1A: "Yes, absolutely! Once the work is done, I transfer full ownership to you. You will be the main administrator and have total control.",
+                faq2Q: "Do I have to pay for the bots?",
+                faq2A: "No! I only use high quality free bots. You don't have to pay anything extra for them to work.",
+                faq3Q: "Can you work on a server I already have?",
+                faq3A: "Yes! I can renovate your existing server. You can either temporarily transfer ownership or simply give me a role with administrator permissions.",
+                faq4Q: "Can I request modifications?",
+                faq4A: "Yes! Your satisfaction is my priority. I offer up to 5 revisions to make sure you're happy with the result.",
+                faq5Q: "Do you create custom coded bots (programming)?",
+                faq5A: "No. I specialize in configuring advanced existing bots (like MEE6, Dyno, Ticket Tool) to do exactly what you need.",
+                faq6Q: "Do you work on NSFW (18+) or illegal servers?",
+                faq6A: "No. I strictly refuse to work on NSFW servers or any server that violates Discord's Terms of Service.",
+                ctaTitle: "Ready to launch your community?",
+                ctaSubtitle: "Send me a message before ordering to discuss your project!",
+                ctaBtn: "🚀 Access the service",
+                copyright: "© 2025 Discord Server Setup. All rights reserved.",
+                // Specific URLs for EN
+                basicUrl: productUrl + '&pckg_id=1', 
+                standardUrl: productUrl + '&pckg_id=2',
+                premiumUrl: productUrl + '&pckg_id=3',
+                contactUrl: productUrl,
+            },
+            es: {
+                badge: "Experto Discord Fiverr 🚀",
+                title1: "Tu Servidor Discord",
+                title2: "Next Level",
+                heroDesc: "Creación de servidores profesionales para gaming, streamers y empresas. Automatizado, seguro y listo para acoger tu comunidad.",
+                btnSeeOffers: "Ver ofertas",
+                btnContact: "Contáctame",
+                howTitle: "¿Cómo funciona?",
+                howSubtitle: "Simple, rápido, eficaz.",
+                step1Title: "Pedido & Brief",
+                step1Desc: "Pide y dime el tema de tu servidor.",
+                step2Title: "Construcción",
+                step2Desc: "Configuro roles, bots y diseño completo.",
+                step3Title: "Entrega",
+                step3Desc: "Te transfiero la propiedad total del servidor.",
+                whyTitle: "¿Por Qué Elegirme?",
+                why1Title: "Relación Calidad/Precio",
+                why1Desc: "Estoy construyendo mi portafolio, te beneficias de un servicio premium (5-20$) al mejor precio.",
+                why2Title: "Rápido & Experto",
+                why2Desc: "Pruebas personales de todos los bots, roles y permisos antes de la entrega.",
+                why3Title: "Seguridad Total",
+                why3Desc: "Sin bots sospechosos. Configuración anti-raid y verificación incluida.",
+                why4Title: "Especialista Gaming",
+                why4Desc: "Experiencia profunda para comunidades de juegos y streamers.",
+                packagesTitle: "Elige Tu Plan",
+                basic: "BÁSICO",
+                standard: "ESTÁNDAR",
+                premium: "PREMIUM",
+                bestChoice: "MEJOR OPCIÓN",
+                feature1: "Diseño profesional y canales",
+                feature2: "Roles y permisos personalizados",
+                feature3: "Bot de bienvenida",
+                feature4: "Relación calidad-precio imbatible",
+                feature5: "Todo lo de Básico",
+                feature6: "Sistema de verificación (Seguridad)",
+                feature7: "Auto-moderación",
+                feature8: "Bots de Música & Mini-juegos",
+                feature9: "Emojis personalizados",
+                feature10: "Todo lo de Estándar",
+                feature11: "Sistema de Tickets (Soporte)",
+                feature12: "Seguridad Anti-Raid avanzada",
+                feature13: "Sistema de Niveles",
+                feature14: "Alertas Twitch & YouTube",
+                btnChoose: "Elige tu plan",
+                delivery2: "⏱️ Entrega en 2 días",
+                delivery3: "⏱️ Entrega en 3 días",
+                delivery5: "⏱️ Entrega en 5 días",
+                faqTitle: "Preguntas Frecuentes",
+                faq1Q: "¿Seré el propietario del servidor una vez terminado?",
+                faq1A: "¡Sí, absolutamente! Una vez terminado el trabajo, te transfiero la propiedad completa. Serás el administrador principal y tendrás control total.",
+                faq2Q: "¿Tengo que pagar por los bots?",
+                faq2A: "¡No! Solo uso bots gratuitos de alta calidad. No tienes que pagar nada extra para que funcionen.",
+                faq3Q: "¿Puedes trabajar en un servidor que ya tengo?",
+                faq3A: "¡Sí! Puedo renovar tu servidor existente. Puedes transferir temporalmente la propiedad o simplemente darme un rol con permisos de administrador.",
+                faq4Q: "¿Puedo solicitar modificaciones?",
+                faq4A: "¡Sí! Tu satisfacción es mi prioridad. Ofrezco hasta 5 revisiones para asegurarme de que estés contento con el resultado.",
+                faq5Q: "¿Creas bots codificados a medida (programación)?",
+                faq5A: "No. Me especializo en configurar bots existentes avanzados (como MEE6, Dyno, Ticket Tool) para hacer exactamente lo que necesitas.",
+                faq6Q: "¿Trabajas en servidores NSFW (18+) o ilegales?",
+                faq6A: "No. Me niego estrictamente a trabajar en servidores NSFW o cualquier servidor que viole los Términos de Servicio de Discord.",
+                ctaTitle: "¿Listo para lanzar tu comunidad?",
+                ctaSubtitle: "¡Envíame un message avant de ordenar para discutir tu proyecto!",
+                ctaBtn: "🚀 Accede al servicio",
+                copyright: "© 2025 Discord Server Setup. Todos los derechos reservados.",
+                // Specific URLs for ES
+                basicUrl: productUrl + '&pckg_id=1',
+                standardUrl: productUrl + '&pckg_id=2',
+                premiumUrl: productUrl + '&pckg_id=3',
+                contactUrl: productUrl,
+            }
+        };
+
+        const fiverrUrlFr = "https://fr.fiverr.com/liam_db"; // Base FR URL (for non-payment links that don't need the product page)
+
+        let currentLang = 'fr';
+        const contentWrapper = document.getElementById('contentWrapper');
+        const langBtns = document.querySelectorAll('.lang-btn');
+
+        // Function to apply translations and update links
+        function applyLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            document.documentElement.lang = lang; // Update HTML lang attribute
+            
+            // --- Update general Fiverr Links (Contact buttons and See Offers) ---
+            document.querySelector('.btn-secondary').href = (lang === 'fr') ? fiverrUrlFr : 'https://www.fiverr.com/liam_db'; // Revert to base contact link for the secondary button
+            document.querySelector('.cta-button').href = productUrl; // CTA button links to the specific service page
+            
+            // --- Update Package Button Links (direct payment sessions) ---
+            const packageButtons = document.querySelectorAll('.package-card .package-button');
+            if (packageButtons.length === 3) {
+                // For direct payment buttons, we use the specific links provided by the user for FR, and fall back to product page links for EN/ES
+                packageButtons[0].setAttribute('onclick', `window.open('${t.basicUrl}', '_blank')`);
+                packageButtons[1].setAttribute('onclick', `window.open('${t.standardUrl}', '_blank')`);
+                packageButtons[2].setAttribute('onclick', `window.open('${t.premiumUrl}', '_blank')`);
+            }
+
+            // Update all elements using data-key
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) {
+                    // Update text content
+                    if (el.tagName === 'A' || el.tagName === 'BUTTON') {
+                        // Special handling for the CTA button
+                        if (key === 'ctaBtn') {
+                            el.textContent = t.ctaBtn;
+                        } else {
+                            el.textContent = t[key];
+                        }
+                    } else if (key === 'faq1Q' || key === 'faq2Q' || key === 'faq3Q' || key === 'faq4Q' || key === 'faq5Q' || key === 'faq6Q') {
+                        // FAQ questions are inside a span inside .faq-question
+                        el.textContent = t[key];
+                    } else {
+                        // General text content update
+                        el.textContent = t[key];
+                    }
+                }
+            });
+
+            // Update package feature list items (they are spread across two packages)
+            const features = [
+                t.feature1, t.feature2, t.feature3, t.feature4,
+                t.feature5, t.feature6, t.feature7, t.feature8, t.feature9,
+                t.feature10, t.feature11, t.feature12, t.feature13, t.feature14
+            ];
+            document.querySelectorAll('.package-features .feature-item').forEach((item, index) => {
+                item.textContent = features[index];
+            });
+
+            // Update delivery texts (which were using inline styles)
+            const deliveries = document.querySelectorAll('.package-card p[style*="text-align: center"]');
+            deliveries[0].textContent = t.delivery2;
+            deliveries[1].textContent = t.delivery3;
+            deliveries[2].textContent = t.delivery5;
+
+            // Update active button classes
+            langBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Function to handle the transition animation
+        function startLanguageChange(newLang) {
+            if (newLang === currentLang) return;
+
+            // 1. Start fade-out animation
+            contentWrapper.classList.add('transitioning');
+
+            // 2. Wait for the transition to complete (500ms based on CSS transition)
+            setTimeout(() => {
+                // 3. Apply new content while invisible
+                applyLanguage(newLang);
+
+                // 4. Start fade-in animation
+                contentWrapper.classList.remove('transitioning');
+            }, 500); // Should match CSS transition duration
+        }
+
+        // Initialize with the current language (fr by default in HTML)
+        document.addEventListener('DOMContentLoaded', () => {
+             // We start by applying the default language's translation just in case
+            applyLanguage(document.documentElement.lang);
+
+            // FAQ Accordion
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                    if (!isActive) item.classList.add('active');
+                });
+            });
+
+            // Smooth Scroll
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            // Scroll Animations (re-run observer setup)
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    } else {
+                        // Remove visible class when scrolling back up
+                        entry.target.classList.remove('visible');
+                    }
+                });
+            }, observerOptions);
+            // Observe all animated elements
+            document.querySelectorAll('.step-item, .why-card, .package-card, .faq-item, .section-title, .section-subtitle').forEach(el => {
+                observer.observe(el);
+            });
+        });
+
+
+        // Interactive Space Background
+        const canvas = document.getElementById('spaceCanvas');
+        const ctx = canvas.getContext('2d');
+                
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+        let targetMouseX = mouseX;
+        let targetMouseY = mouseY;
+
+        // Mouse tracking
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        function drawBackground() {
+            // Smooth mouse follow
+            mouseX += (targetMouseX - mouseX) * 0.05;
+            mouseY += (targetMouseY - mouseY) * 0.05;
+
+            // Simple gradient background
+            ctx.fillStyle = '#0a0118';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add some subtle color variation
+            ctx.fillStyle = 'rgba(29, 27, 78, 0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+        }
+
+        // Particles that react to mouse
+        const particles = [];
+        const particleCount = 100;
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 5;
+                this.opacity = Math.random();
+                this.opacitySpeed = Math.random() * 0.02 + 0.01;
+            }
+            update() {
+                // Mouse interaction
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const forceDirectionX = dx / distance;
+                const forceDirectionY = dy / distance;
+                const maxDistance = 200;
+                const force = (maxDistance - distance) / maxDistance;
+
+                if (distance < maxDistance) {
+                    const directionX = forceDirectionX * force * this.density * 0.5;
+                    const directionY = forceDirectionY * force * this.density * 0.5;
+                    this.x -= directionX;
+                    this.y -= directionY;
+                } else {
+                    if (this.x !== this.baseX) {
+                        this.x += (this.baseX - this.x) * 0.05;
+                    }
+                    if (this.y !== this.baseY) {
+                        this.y += (this.baseY - this.y) * 0.05;
+                    }
+                }
+                // Twinkle effect
+                this.opacity += this.opacitySpeed;
+                if (this.opacity >= 1 || this.opacity <= 0.2) {
+                    this.opacitySpeed *= -1;
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+
+                // Simple glow - use shadow blur
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#a78bfa';
+
+                // Core
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        // Connection lines between nearby particles
+        function connectParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 120) {
+                        ctx.strokeStyle = `rgba(124, 58, 237, ${0.3 * (1 - distance / 120)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Mouse light effect (small spotlight)
+        function drawMouseLight() {
+            ctx.save();
+
+            // Small bright light
+            ctx.globalAlpha = 0.4;
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowBlur = 60;
+            ctx.shadowColor = '#a78bfa';
+            ctx.beginPath();
+            ctx.arc(mouseX, mouseY, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Soft outer glow
+            ctx.globalAlpha = 0.2;
+            ctx.shadowBlur = 40;
+            ctx.fillStyle = '#7c3aed';
+            ctx.beginPath();
+            ctx.arc(mouseX, mouseY, 25, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Floating orbs (background elements)
+        const orbs = [];
+        class Orb {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 100 + 50;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.color = Math.random() > 0.5 ? 'rgba(124, 58, 237, 0.05)' : 'rgba(99, 102, 241, 0.05)';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                // Mouse repulsion
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 200) {
+                    this.x -= dx * 0.001;
+                    this.y -= dy * 0.001;
+                }
+                // Wrap around edges
+                if (this.x < -this.size) this.x = canvas.width + this.size;
+                if (this.x > canvas.width + this.size) this.x = -this.size;
+                if (this.y < -this.size) this.y = canvas.height + this.size;
+                if (this.y > canvas.height + this.size) this.y = -this.size;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = 0.05;
+                // Set color based on initialization (since we can't use linear gradient on canvas fillStyle easily)
+                ctx.fillStyle = this.color.includes('124') ? '#7c3aed' : '#6366f1'; 
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        for (let i = 0; i < 5; i++) {
+            orbs.push(new Orb());
+        }
+
+        function animate() {
+            drawBackground();
+
+            // Draw orbs
+            orbs.forEach(orb => {
+                orb.update();
+                orb.draw();
+            });
+
+            // Draw particles
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            // Connect particles
+            connectParticles();
+            // Mouse light
+            drawMouseLight();
+
+            requestAnimationFrame(animate);
+        }
+        
+        // Start animation loop
+        window.onload = function () {
+             animate();
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // Reinitialize particles positions
+            particles.forEach(particle => {
+                particle.baseX = Math.random() * canvas.width;
+                particle.baseY = Math.random() * canvas.height;
+                particle.x = particle.baseX;
+                particle.y = particle.baseY;
+            });
+        });
+    </script>
+</body>
+</html>
